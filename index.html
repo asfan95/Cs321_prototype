@@ -1,0 +1,160 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Where Waldo</title>
+    <script type="text/javascript" src="js/phaser.min.js"></script>
+    <style type="text/css">
+        body 
+        {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'Where Waldo', { preload: preload, create: create, update: update });
+function preload() {
+
+    game.load.image('Waldo', 'pic/waldo.png');
+
+    game.load.image('other1', 'pic/other1.png');
+    game.load.image('other2', 'pic/other2.png');
+    game.load.image('other3', 'pic/other3.png');
+    game.load.image('other4', 'pic/other4.png');
+    game.load.image('other5', 'pic/other5.png');
+
+    game.load.image('egypt', 'pic/egypt.jpg');
+    game.load.image('Title', 'pic/Title.png');
+    game.load.image('gameOver', 'pic/gameOver.png');
+
+}
+
+var waldo;
+var others;
+var timer=1000;
+var timerText;
+var round=0;
+var cursors;
+var score = 0;
+var scoreText;
+var sound;
+var roundClear=false;
+var Page;
+function create() 
+{
+    //  We're going to be using physics, so enable the Arcade Physics system
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+    game.add.tileSprite(0, 0, 2000, 1000, 'egypt');
+
+    Page=game.add.sprite( 800, 600, 'Title');
+
+    //  A simple background for our game
+    game.add.tileSprite(0, 0, 2000, 1000, 'egypt');
+
+    game.world.setBounds(0, 0, 1920, 1920);
+    // The player and its settings
+    waldo = game.add.sprite(100, 50, 'Waldo');
+ 
+    others = game.add.group();
+
+    waldo.inputEnabled = true;
+    waldo.events.onInputDown.add(listener, this); 
+
+    //  Our controls.
+    cursors = game.input.keyboard.createCursorKeys();
+    
+    game.input.mouse.capture = true;
+
+    //  The score
+    timerText = game.add.text(16, 16, 'Time Left: 1000', { fontSize: '32px', fill: '#000' });
+    scoreText = game.add.text(575, 16, 'Player Score: 0', { fontSize: '32px', fill: '#000' });
+    this.leftKey = game.input.keyboard.addKey(Phaser.Keyboard.A);
+    this.upKey = game.input.keyboard.addKey(Phaser.Keyboard.W);
+    this.downKey = game.input.keyboard.addKey(Phaser.Keyboard.S);
+    this.rightKey = game.input.keyboard.addKey(Phaser.Keyboard.D);
+    this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+    game.input.keyboard.addKeyCapture([ Phaser.Keyboard.W, Phaser.Keyboard.A,Phaser.Keyboard.S,Phaser.Keyboard.D, Phaser.Keyboard.SPACEBAR ]);
+    
+
+}
+
+function update()
+{
+    if(this.spaceKey.isDown && round==1)
+    {
+        round=2;
+        page.destroy();
+    }
+    if(round==0)
+    {
+        page = game.add.sprite(0, 0, 'Title');
+        round=1;
+    }
+    if(timer!=0 && round==2)
+    {
+
+        timer=timer-1;
+        timerText.text = 'Time Left: ' + timer;
+
+        var randInt1 = game.rnd.integerInRange(0, 800);
+        var randInt2 = game.rnd.integerInRange(0, 600);
+        var randInt3 = game.rnd.integerInRange(0, 100);
+        var randInt4 = game.rnd.integerInRange(0, randInt3);
+
+        if(roundClear==true)
+        {
+
+            for(var i=0; i <randInt3;i++)
+            {
+                    var randInt5 = game.rnd.integerInRange(0, 4);
+
+                    randInt1 = game.rnd.integerInRange(0, 750);
+                    randInt2 = game.rnd.integerInRange(0, 550);
+                    
+                    if(randInt5==1)
+                        var enem = others.create(randInt1,randInt2, 'other1');
+                    if(randInt5==2)
+                        var enem = others.create(randInt1,randInt2, 'other2');
+                    if(randInt5==3)
+                        var enem = others.create(randInt1,randInt2, 'other3');
+                    if(randInt5==4)
+                        var enem = others.create(randInt1,randInt2, 'other4');
+                    if(randInt5==5)
+                        var enem = others.create(randInt1,randInt2, 'other5');
+               
+                if(roundClear==true && i==randInt4)
+                {
+                    waldo = game.add.sprite(randInt1, randInt2, 'Waldo');
+                    waldo.inputEnabled = true;
+                    waldo.events.onInputDown.add(listener, this); 
+                    roundClear=false;
+                }
+            }
+        }
+
+    }
+    if(timer==0)
+    {
+        page = game.add.sprite(0, 0, 'gameOver');
+        round=3;
+        game.add.tileSprite(0, 0, 2000, 1000, 'gameOver');
+        scoreText.text = "Final Score: " + score;
+
+
+    }
+}
+function listener () {
+
+    score++;
+    scoreText.text = "Player Score: " + score;
+    waldo.destroy();
+    roundClear=true
+}
+</script>
+<div id="game">
+    
+</div>
+
+</body>
+</html>
